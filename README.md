@@ -28,7 +28,7 @@ int main()
         printf("%d", nums[i]);
     }
 
-    free(nums);
+    lvec_free(nums);
 }
 ```
 
@@ -44,7 +44,7 @@ typedef struct Vector2
 int main()
 {
     Vector2* vecs = lvec_new(Vector2);
-    if (nums == NULL)
+    if (vecs == NULL)
     {
         // handle error
         return 1;
@@ -56,7 +56,7 @@ int main()
     Vector2 vec2 = { 3, 6 };
     lvec_append_aggregate(vecs, vec2);
 
-    free(nums);
+    lvec_free(nums);
 }
 ```
 
@@ -78,7 +78,7 @@ int main()
         // handle error
     }
 
-    free(nums);
+    lvec_free(nums);
 }
 ```
 

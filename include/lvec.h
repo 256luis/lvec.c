@@ -12,6 +12,11 @@
       int main()
       {
           int* nums = lvec_new(int);
+          if (nums == NULL)
+          {
+              // handle error
+              return 1;
+          }
 
           lvec_append(nums, 10);
           lvec_append(nums, 20);
@@ -20,7 +25,7 @@
               printf("%d", nums[i]);
           }
 
-          free(nums);
+          lvec_free(nums);
       }
 
   Make sure to use the *_aggregate functions when appending and inserting to an lvec
@@ -35,6 +40,11 @@
       int main()
       {
           Vector2* vecs = lvec_new(Vector2);
+          if (vecs == NULL)
+          {
+              // handle error
+              return 1;
+          }
 
           Vector2 vec1 = { 0, 1 };
           lvec_append_aggregate(vecs, vec1);
@@ -42,7 +52,7 @@
           Vector2 vec2 = { 3, 6 };
           lvec_append_aggregate(vecs, vec2);
 
-          free(nums);
+          lvec_free(nums);
       }
 
   You can also check the return value for success or failure.
@@ -50,6 +60,11 @@
       int main()
       {
           int* nums = lvec_new(int);
+          if (nums == NULL)
+          {
+              // handle error
+              return 1;
+          }
 
           LVecResult result = lvec_append(nums, 20);
           if (result != LVECRESULT_SUCCESS)
@@ -57,7 +72,7 @@
               // handle error
           }
 
-          free(nums);
+          lvec_free(nums);
       }
  */
 
