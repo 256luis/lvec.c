@@ -14,6 +14,11 @@ Include the `lvec.h` header file and use the `lvec_`* functions.
 int main()
 {
     int* nums = lvec_new(int);
+    if (nums == NULL)
+    {
+        // handle error
+        return 1;
+    }
 
     lvec_append(nums, 10);
     lvec_append(nums, 20);
@@ -39,6 +44,11 @@ typedef struct Vector2
 int main()
 {
     Vector2* vecs = lvec_new(Vector2);
+    if (nums == NULL)
+    {
+        // handle error
+        return 1;
+    }
 
     Vector2 vec1 = { 0, 1 };
     lvec_append_aggregate(vecs, vec1);
@@ -56,6 +66,11 @@ You can also check the return value for success or failure.
 int main()
 {
     int* nums = lvec_new(int);
+    if (nums == NULL)
+    {
+        // handle error
+        return 1;
+    }
 
     LVecResult result = lvec_append(nums, 20);
     if (result != LVECRESULT_SUCCESS)
