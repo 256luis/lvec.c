@@ -13,7 +13,7 @@ Include the `lvec.h` header file and use the `lvec_`* functions.
 
 int main()
 {
-	int* nums = lvec_new(int);
+    int* nums = lvec_new(int);
 
     lvec_append(nums, 10);
     lvec_append(nums, 20);
@@ -23,7 +23,7 @@ int main()
         printf("%d", nums[i]);
     }
 
-	free(nums);
+    free(nums);
 }
 ```
 
