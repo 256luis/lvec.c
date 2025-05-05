@@ -5,11 +5,11 @@
 #include <stddef.h>
 #include "list.h"
 
-#define LIST_INITIAL_CAPACITY 10
-#define LIST_MINIMUM_CAPACITY 2
-#define LIST_GROWTH_RATE 1.5
+#define LVEC_INITIAL_CAPACITY 10
+#define LVEC_MINIMUM_CAPACITY 2
+#define LVEC_GROWTH_RATE 1.5
 
-typedef struct List
+typedef struct LVecInfo
 {
     // header
     size_t length;
@@ -18,227 +18,227 @@ typedef struct List
 
     // actual data
     char data[];
-} List;
+} LVecInfo;
 
-typedef union ListUnion
+typedef union LVecUnion
 {
     void* _void;
     char* _char;
-    List* _list;
-} ListUnion;
+    LVecInfo* lvec_info;
+} LVecUnion;
 
-void* _list_new( size_t type_size )
+void* _lvec_new( size_t type_size )
 {
-    List* list = malloc( sizeof( List ) + ( type_size * LIST_INITIAL_CAPACITY ) );
-    if( list == NULL )
+    LVecInfo* lvec_info = malloc( sizeof( LVecInfo ) + ( type_size * LVEC_INITIAL_CAPACITY ) );
+    if( lvec_info == NULL )
     {
         return NULL;
     }
 
-    list->length = 0;
-    list->capacity = LIST_INITIAL_CAPACITY;
-    list->element_size = type_size;
+    lvec_info->length = 0;
+    lvec_info->capacity = LVEC_INITIAL_CAPACITY;
+    lvec_info->element_size = type_size;
 
-    return list->data;
+    return lvec_info->data;
 }
 
-static inline List* internal_list_get_header( void* list_data )
+static inline LVecInfo* internal_lvec_get_info( void* lvec )
 {
-    ListUnion list_union = { ._void = list_data };
-    list_union._char -= offsetof( List, data );
-    List* list = list_union._list;
+    LVecUnion lvec_union = { ._void = lvec };
+    lvec_union._char -= offsetof( LVecInfo, data );
+    LVecInfo* lvec_info = lvec_union.lvec_info;
 
-    return list;
+    return lvec_info;
 }
 
-static inline ListResult internal_list_grow( List** list, float multiplier )
+static inline LVecResult internal_lvec_grow( LVecInfo** lvec_info, float multiplier )
 {
-    size_t new_capacity = ( *list )->capacity * multiplier;
-    List* tmp = realloc( *list, sizeof( List ) + ( ( *list )->element_size * new_capacity ) );
+    size_t new_capacity = ( *lvec_info )->capacity * multiplier;
+    LVecInfo* tmp = realloc( *lvec_info, sizeof( LVecInfo ) + ( ( *lvec_info )->element_size * new_capacity ) );
 
     if( tmp == NULL )
     {
-        return LISTRESULT_ERROR_ALLOCATION;
+        return LVECRESULT_ERROR_ALLOCATION;
     }
 
-    *list = tmp;
-    ( *list )->capacity = new_capacity;
+    *lvec_info = tmp;
+    ( *lvec_info )->capacity = new_capacity;
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-void list_free( void* list_data )
+void lvec_free( void* lvec )
 {
-    List* list = internal_list_get_header( list_data );
-    free( list );
+    LVecInfo* lvec_info = internal_lvec_get_info( lvec );
+    free( lvec_info );
 }
 
-static inline ListResult internal_list_reserve_minimum( List** list, size_t desired_capacity )
+static inline LVecResult internal_lvec_reserve_minimum( LVecInfo** lvec_info, size_t desired_capacity )
 {
-    if( ( *list )->capacity >= desired_capacity )
+    if( ( *lvec_info )->capacity >= desired_capacity )
     {
-        return LISTRESULT_SUCCESS;
+        return LVECRESULT_SUCCESS;
     }
 
     // TODO: There is a way to calculate times_to_grow without using a loop. Implement
     //       that.
     int times_to_grow = 1;
-    while( ( *list )->capacity * LIST_GROWTH_RATE * times_to_grow < desired_capacity )
+    while( ( *lvec_info )->capacity * LVEC_GROWTH_RATE * times_to_grow < desired_capacity )
     {
         times_to_grow++;
     }
 
-    ListResult grow_result = internal_list_grow( list, LIST_GROWTH_RATE * times_to_grow );
-    if( grow_result != LISTRESULT_SUCCESS )
+    LVecResult grow_result = internal_lvec_grow( lvec_info, LVEC_GROWTH_RATE * times_to_grow );
+    if( grow_result != LVECRESULT_SUCCESS )
     {
         return grow_result;
     }
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-ListResult _list_reserve_minimum( void** list_data, size_t desired_capacity )
+LVecResult _lvec_reserve_minimum( void** lvec, size_t desired_capacity )
 {
-    List* list = internal_list_get_header( *list_data );
+    LVecInfo* lvec_info = internal_lvec_get_info( *lvec );
 
-    ListResult reserve_result = internal_list_reserve_minimum( &list, desired_capacity );
-    if( reserve_result != LISTRESULT_SUCCESS )
+    LVecResult reserve_result = internal_lvec_reserve_minimum( &lvec_info, desired_capacity );
+    if( reserve_result != LVECRESULT_SUCCESS )
     {
         return reserve_result;
     }
-    *list_data = list->data;
+    *lvec = lvec_info->data;
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-ListResult _list_shrink_to_fit( void** list_data )
+LVecResult _lvec_shrink_to_fit( void** lvec )
 {
-    List* list = internal_list_get_header( *list_data );
+    LVecInfo* lvec_info = internal_lvec_get_info( *lvec );
 
-    //     new_capacity = max( LIST_MINIMUM_CAPACITY, list->length );
-    size_t new_capacity = ( LIST_MINIMUM_CAPACITY > list->length ) ? LIST_MINIMUM_CAPACITY : list->length;
-    List* tmp = realloc( list, sizeof( List ) + ( list->element_size * new_capacity ) );
+    //     new_capacity = max( LIST_MINIMUM_CAPACITY, lvec_info->length );
+    size_t new_capacity = ( LVEC_MINIMUM_CAPACITY > lvec_info->length ) ? LVEC_MINIMUM_CAPACITY : lvec_info->length;
+    LVecInfo* tmp = realloc( lvec_info, sizeof( LVecInfo ) + ( lvec_info->element_size * new_capacity ) );
 
     if( tmp == NULL )
     {
-        return LISTRESULT_ERROR_ALLOCATION;
+        return LVECRESULT_ERROR_ALLOCATION;
     }
 
-    list = tmp;
-    list->capacity = new_capacity;
-    *list_data = list->data;
+    lvec_info = tmp;
+    lvec_info->capacity = new_capacity;
+    *lvec = lvec_info->data;
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-ListResult _list_append( void** list_data, void* input_data )
+LVecResult _lvec_append( void** lvec, void* input_data )
 {
-    List* list = internal_list_get_header( *list_data );
+    LVecInfo* lvec_info = internal_lvec_get_info( *lvec );
 
     // increase capacity if not enough
-    if( list->length + 1 > list->capacity )
+    if( lvec_info->length + 1 > lvec_info->capacity )
     {
-        ListResult grow_result = internal_list_grow( &list, LIST_GROWTH_RATE );
-        if( grow_result != LISTRESULT_SUCCESS )
+        LVecResult grow_result = internal_lvec_grow( &lvec_info, LVEC_GROWTH_RATE );
+        if( grow_result != LVECRESULT_SUCCESS )
         {
             return grow_result;
         }
 
-        *list_data = list->data;
+        *lvec = lvec_info->data;
     }
 
     // offset of last element + 1 or where we would place the data to be appended
-    size_t bytes_offset = list->length * list->element_size;
-    memcpy( list->data + bytes_offset,
+    size_t bytes_offset = lvec_info->length * lvec_info->element_size;
+    memcpy( lvec_info->data + bytes_offset,
             input_data,
-            list->element_size );
+            lvec_info->element_size );
 
-    list->length++;
+    lvec_info->length++;
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-ListResult _list_insert( void** list_data, void* input_data, size_t index )
+LVecResult _lvec_insert( void** lvec, void* input_data, size_t index )
 {
-    List* list = internal_list_get_header( *list_data );
-    if( index >= list->length ) return LISTRESULT_ERROR_OUT_OF_BOUNDS;
+    LVecInfo* lvec_info = internal_lvec_get_info( *lvec );
+    if( index >= lvec_info->length ) return LVECRESULT_ERROR_OUT_OF_BOUNDS;
 
     // increase capacity if not enough
-    if( list->length + 1 > list->capacity )
+    if( lvec_info->length + 1 > lvec_info->capacity )
     {
-        ListResult grow_result = internal_list_grow( &list, LIST_GROWTH_RATE );
-        if( grow_result != LISTRESULT_SUCCESS )
+        LVecResult grow_result = internal_lvec_grow( &lvec_info, LVEC_GROWTH_RATE );
+        if( grow_result != LVECRESULT_SUCCESS )
         {
             return grow_result;
         }
 
-        *list_data = list->data;
+        *lvec = lvec_info->data;
     }
 
     // get offset at index
-    size_t byte_offset_at_index = list->element_size * index;
+    size_t byte_offset_at_index = lvec_info->element_size * index;
 
     // number of bytes from index to end of array
-    size_t remaining_bytes = ( list->length * list->element_size ) - byte_offset_at_index;
+    size_t remaining_bytes = ( lvec_info->length * lvec_info->element_size ) - byte_offset_at_index;
 
     // shift everything from index to end of array to the right
-    memmove( list->data + byte_offset_at_index + list->element_size,
-             list->data + byte_offset_at_index,
+    memmove( lvec_info->data + byte_offset_at_index + lvec_info->element_size,
+             lvec_info->data + byte_offset_at_index,
              remaining_bytes );
 
     // insert input_data
-    memcpy( list->data + byte_offset_at_index,
+    memcpy( lvec_info->data + byte_offset_at_index,
             input_data,
-            list->element_size );
+            lvec_info->element_size );
 
-    list->length++;
+    lvec_info->length++;
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-ListResult _list_remove( void** list_data, size_t index )
+LVecResult _lvec_remove( void** lvec, size_t index )
 {
-    List* list = internal_list_get_header( *list_data );
-    if( index >= list->length ) return LISTRESULT_ERROR_OUT_OF_BOUNDS;
+    LVecInfo* lvec_info = internal_lvec_get_info( *lvec );
+    if( index >= lvec_info->length ) return LVECRESULT_ERROR_OUT_OF_BOUNDS;
 
-    list->length--;
+    lvec_info->length--;
 
     // if the last element is the one getting removed
-    if( index == list->length )
+    if( index == lvec_info->length )
     {
-        return LISTRESULT_SUCCESS;
+        return LVECRESULT_SUCCESS;
     }
 
     // get offset at index
-    size_t byte_offset_at_index = list->element_size * index;
+    size_t byte_offset_at_index = lvec_info->element_size * index;
 
     // number of bytes from index to end of array
-    size_t remaining_bytes = ( list->length * list->element_size ) - byte_offset_at_index;
+    size_t remaining_bytes = ( lvec_info->length * lvec_info->element_size ) - byte_offset_at_index;
 
     // shift everything from index to end of array to the left
-    memmove( list->data + byte_offset_at_index,
-             list->data + byte_offset_at_index + list->element_size,
+    memmove( lvec_info->data + byte_offset_at_index,
+             lvec_info->data + byte_offset_at_index + lvec_info->element_size,
              remaining_bytes );
 
-    return LISTRESULT_SUCCESS;
+    return LVECRESULT_SUCCESS;
 }
 
-void list_clear( void* list_data )
+void lvec_clear( void* lvec )
 {
-    List* list = internal_list_get_header( list_data );
-    list->length = 0;
+    LVecInfo* lvec_info = internal_lvec_get_info( lvec );
+    lvec_info->length = 0;
 }
 
-size_t list_get_length( void* list_data )
+size_t lvec_get_length( void* lvec )
 {
-    List* list = internal_list_get_header( list_data );
+    LVecInfo* lvec_info = internal_lvec_get_info( lvec );
 
-    return list->length;
+    return lvec_info->length;
 }
 
-size_t list_get_capacity( void* list_data )
+size_t lvec_get_capacity( void* lvec )
 {
-    List* list = internal_list_get_header( list_data );
+    LVecInfo* lvec_info = internal_lvec_get_info( lvec );
 
-    return list->capacity;
+    return lvec_info->capacity;
 }

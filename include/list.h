@@ -62,81 +62,81 @@
 #define LIST_H
 
 // allocated memory for a new list
-#define list_new( T ) \
-    _list_new( sizeof( T ) )
+#define lvec_new( T ) \
+    _lvec_new( sizeof( T ) )
 
 // appends an element to the end of the list (use this for primitive types and enums)
-#define list_append( list_data, data ) \
-    _list_append( ( void** )&( list_data ), &( typeof( *( list_data ) ) ){ ( data ) } )
+#define lvec_append( lvec, data ) \
+    _lvec_append( ( void** )&( lvec ), &( typeof( *( lvec ) ) ){ ( data ) } )
 
 // appends an element to the end of the list (use this for structs and unions)
-#define list_append_aggregate( list_data, data ) \
-    _list_append( ( void** )&( list_data ), &( data ) )
+#define lvec_append_aggregate( lvec, data ) \
+    _lvec_append( ( void** )&( lvec ), &( data ) )
 
 // appends an element at the specified index (use this for primitive types and enums)
-#define list_insert( list_data, data, index ) \
-    _list_insert( ( void** )&( list_data ), &( typeof( *( list_data ) ) ){ ( data ) }, ( index ) )
+#define lvec_insert( lvec, data, index ) \
+    _lvec_insert( ( void** )&( lvec ), &( typeof( *( lvec ) ) ){ ( data ) }, ( index ) )
 
 // appends an element at the specified index (use this for structs and unions)
-#define list_insert_aggregate( list_data, data, index ) \
-    _list_insert( ( void** )&( list_data ), &( data ), ( index ) )
+#define lvec_insert_aggregate( lvec, data, index ) \
+    _lvec_insert( ( void** )&( lvec ), &( data ), ( index ) )
 
 // removes an element by index
-#define list_remove( list_data, index ) \
-    _list_remove( ( void** )&( list_data ), ( index ) )
+#define lvec_remove( lvec, index ) \
+    _lvec_remove( ( void** )&( lvec ), ( index ) )
 
 // removes the last element in the list
-#define list_remove_last( list_data ) \
-    _list_remove( ( void** )&( list_data ), list_get_length( list_data ) - 1 )
+#define lvec_remove_last( lvec ) \
+    _lvec_remove( ( void** )&( lvec ), list_get_length( lvec ) - 1 )
 
 // allocates enough memory for at least the specified capacity
-#define list_reserve_minimum( list_data, desired_capacity ) \
-    _list_reserve_minimum( ( void** )&( list_data ), ( desired_capacity ) )
+#define lvec_reserve_minimum( lvec, desired_capacity ) \
+    _lvec_reserve_minimum( ( void** )&( lvec ), ( desired_capacity ) )
 
 // resizes array to match the length of the list
-#define list_shrink_to_fit( list_data ) \
-    _list_shrink_to_fit( ( void** )&( list_data ) )
+#define lvec_shrink_to_fit( lvec ) \
+    _lvec_shrink_to_fit( ( void** )&( lvec ) )
 
 // checks if length of list is 0
-#define list_is_empty( list_data ) \
-    ( list_get_length( list_data ) == 0 )
+#define lvec_is_empty( lvec ) \
+    ( lvecget_length( lvec ) == 0 )
 
 // used as return values for functions that can fail
-typedef enum ListResult
+typedef enum LVecResult
 {
-    LISTRESULT_SUCCESS,
-    LISTRESULT_ERROR_OUT_OF_BOUNDS,
-    LISTRESULT_ERROR_ALLOCATION,
-} ListResult;
+    LVECRESULT_SUCCESS,
+    LVECRESULT_ERROR_OUT_OF_BOUNDS,
+    LVECRESULT_ERROR_ALLOCATION,
+} LVecResult;
 
 // allocates memory for a new list (use the macro version)
-void* _list_new( size_t size );
+void* _lvec_new( size_t size );
 
 // deallocates memory for allocated list
-void list_free( void* list_data );
+void lvec_free( void* lvec );
 
 // allocates enough memory for at least the specified capacity (use the macro version)
-ListResult _list_reserve_minimum( void** list_data, size_t desired_capacity );
+LVecResult _lvec_reserve_minimum( void** lvec, size_t desired_capacity );
 
 // resizes array to match the length of the list (use the macro version)
-ListResult _list_shrink_to_fit( void** list_data );
+LVecResult _lvec_shrink_to_fit( void** lvec );
 
 // appends an element to the end of the list (use macro version)
-ListResult _list_append( void** list_data, void* data );
+LVecResult _lvec_append( void** lvec, void* data );
 
 // appends an element at the specified index (use macro version)
-ListResult _list_insert( void** list_data, void* input_data, size_t index );
+LVecResult _lvec_insert( void** lvec, void* input_data, size_t index );
 
 // removes an element by index (use the macro version)
-ListResult _list_remove( void** list_data, size_t index );
+LVecResult _lvec_remove( void** lvec, size_t index );
 
 // clears the list
-void list_clear( void* list_data );
+void lvec_clear( void* lvec );
 
 // returns the number of items in the list
-size_t list_get_length( void* list_data );
+size_t lvec_get_length( void* lvec );
 
 // returns how many elements can currently fit on the list
-size_t list_get_capacity( void* list_data );
+size_t lvec_get_capacity( void* lvec );
 
 #endif
