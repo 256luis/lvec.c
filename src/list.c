@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include <math.h>
 #include "list.h"
 
 #define LIST_INITIAL_CAPACITY 10
