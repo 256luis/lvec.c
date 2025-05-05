@@ -117,7 +117,7 @@
 
 // checks if length of lvec is 0
 #define lvec_is_empty( lvec ) \
-    ( lvecget_length( lvec ) == 0 )
+    ( lvec_get_length( lvec ) == 0 )
 
 // used as return values for functions that can fail
 typedef enum LVecResult
