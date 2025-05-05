@@ -4,6 +4,10 @@
   NOTE: Use of this library requires 'typeof' support.
 
   Basic usage:
+  Include the `lvec.h` header file and use the `lvec_`* functions.
+
+      // include ...
+      #include "lvec.h"
 
       int main()
       {
@@ -55,7 +59,6 @@
 
           free(nums);
       }
-
  */
 
 #ifndef LVEC_H
