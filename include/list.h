@@ -61,8 +61,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-#define List( T ) T*
-
 // allocated memory for a new list
 #define list_new( T ) \
     _list_new( sizeof( T ) )
