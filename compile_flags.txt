@@ -1,5 +1,0 @@
--Iinclude
--Wall
--Wextra
--Wpedantic
--std=c23
