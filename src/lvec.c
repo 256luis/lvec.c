@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "list.h"
+#include "lvec.h"
 
 #define LVEC_INITIAL_CAPACITY 10
 #define LVEC_MINIMUM_CAPACITY 2

@@ -58,8 +58,8 @@
 
  */
 
-#ifndef LIST_H
-#define LIST_H
+#ifndef LVEC_H
+#define LVEC_H
 
 // allocated memory for a new list
 #define lvec_new( T ) \
