@@ -1,7 +1,7 @@
 /*
   lvec.c is a simple generic dynamic array implementation.
 
-  NOTE: Use of this library requires 'typeof' support.
+  NOTE: Use of this library requires `__typeof__` support.
 
   Basic usage:
   Include the `lvec.h` header file and use the `lvec_`* functions.
@@ -85,7 +85,7 @@
 
 // appends an element to the end of the lvec (use this for primitive types and enums)
 #define lvec_append( lvec, data ) \
-    _lvec_append( ( void** )&( lvec ), &( typeof( *( lvec ) ) ){ ( data ) } )
+    _lvec_append( ( void** )&( lvec ), &( __typeof__( *( lvec ) ) ){ ( data ) } )
 
 // appends an element to the end of the lvec (use this for structs and unions)
 #define lvec_append_aggregate( lvec, data ) \
@@ -93,7 +93,7 @@
 
 // appends an element at the specified index (use this for primitive types and enums)
 #define lvec_insert( lvec, data, index ) \
-    _lvec_insert( ( void** )&( lvec ), &( typeof( *( lvec ) ) ){ ( data ) }, ( index ) )
+    _lvec_insert( ( void** )&( lvec ), &( __typeof__( *( lvec ) ) ){ ( data ) }, ( index ) )
 
 // appends an element at the specified index (use this for structs and unions)
 #define lvec_insert_aggregate( lvec, data, index ) \
