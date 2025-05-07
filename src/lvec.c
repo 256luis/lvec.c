@@ -38,7 +38,7 @@ void* _lvec_new( size_t type_size )
 static inline LVecInfo* internal_lvec_get_info( void* lvec )
 {
     char* lvec_data = lvec;
-    LVecInfo* lvec_info = lvec_data - offsetof( LVecInfo, data );
+    LVecInfo* lvec_info = ( LVecInfo* )( lvec_data - offsetof( LVecInfo, data ) );
 
     return lvec_info;
 }
