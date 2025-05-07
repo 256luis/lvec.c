@@ -20,13 +20,6 @@ typedef struct LVecInfo
     char data[];
 } LVecInfo;
 
-typedef union LVecUnion
-{
-    void* _void;
-    char* _char;
-    LVecInfo* lvec_info;
-} LVecUnion;
-
 void* _lvec_new( size_t type_size )
 {
     LVecInfo* lvec_info = malloc( sizeof( LVecInfo ) + ( type_size * LVEC_INITIAL_CAPACITY ) );
@@ -44,9 +37,8 @@ void* _lvec_new( size_t type_size )
 
 static inline LVecInfo* internal_lvec_get_info( void* lvec )
 {
-    LVecUnion lvec_union = { ._void = lvec };
-    lvec_union._char -= offsetof( LVecInfo, data );
-    LVecInfo* lvec_info = lvec_union.lvec_info;
+    char* lvec_data = lvec;
+    LVecInfo* lvec_info = lvec_data - offsetof( LVecInfo, data );
 
     return lvec_info;
 }
