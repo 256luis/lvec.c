@@ -79,6 +79,8 @@
 #ifndef LVEC_H
 #define LVEC_H
 
+#include "stddef.h"
+
 // allocates memory for a new lvec
 #define lvec_new( T ) \
     _lvec_new( sizeof( T ) )
